@@ -3,8 +3,14 @@ bgm = {
 		gm3 = love.audio.newSource("res/bgm/tgm_credit_roll.mp3", "stream"),
 	},
 	pacer_test = love.audio.newSource("res/bgm/pacer_test.mp3", "stream"),
+	test = {
+		intro = love.audio.newSource("res/bgm/h_test_intro.wav", "static"),
+		loop = love.audio.newSource("res/bgm/h_test_loop.wav", "stream"),
+	},
 }
 
+
+local frames = 0
 local current_bgm = nil
 local bgm_locked = false
 local unfocused = false
