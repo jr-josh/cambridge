@@ -5,7 +5,7 @@ local playedReadySE = false
 local playedGoSE = false
 
 local Grid = require 'tetris.components.grid'
-local Randomizer = require 'tetris.randomizers.bag7'
+local Randomizer = require 'tetris.randomizers.randomizer'
 local BagRandomizer = require 'tetris.randomizers.bag'
 
 local GameMode = Object:extend()
@@ -100,13 +100,11 @@ end
 function GameMode:initialize(ruleset)
 	-- generate next queue
 	self.used_randomizer = (
-		ruleset.pieces == self.randomizer.possible_pieces and
-		self.randomizer or
-		(
-			ruleset.pieces == 7 and
-			Randomizer() or
-			BagRandomizer(ruleset.pieces)
-		)
+		table.equalvalues(
+			table.keys(ruleset.colourscheme),
+			self.randomizer.possible_pieces
+		) and
+		self.randomizer or BagRandomizer(table.keys(ruleset.colourscheme))
 	)
 	self.ruleset = ruleset
 	for i = 1, math.max(self.next_queue_length, 1) do
@@ -126,6 +124,8 @@ function GameMode:update(inputs, ruleset)
 		if inputs["left"] or inputs["right"] then
 			inputs["up"] = false
 			inputs["down"] = false
+		elseif inputs["down"] then
+			inputs["up"] = false
 		end
 	end
 
@@ -149,7 +149,6 @@ function GameMode:update(inputs, ruleset)
 	else
 		-- perform active frame actions such as fading out the next queue
 		self:whilePieceActive()
-		local gravity = self:getGravity()
 
 		if self.enable_hold and inputs["hold"] == true and self.held == false and self.prev_inputs["hold"] == false then
 			self:hold(inputs, ruleset)
@@ -269,7 +268,8 @@ function GameMode:update(inputs, ruleset)
 			end
 
 			if cleared_row_count > 0 then
-				playSE("erase")
+				local row_count_names = {"single","double","triple","quad"}
+				playSE("erase",row_count_names[cleared_row_count] or "quad")
 				self.lcd = self:getLineClearDelay()
 				self.last_lcd = self.lcd
 				self.are = (
@@ -540,12 +540,12 @@ end
 function GameMode:initializeNextPiece(
 	inputs, ruleset, piece_data, generate_next_piece
 )
-	if not inputs.hold and not self.buffer_soft_drop and self.lock_drop or (
+	if not self.buffer_soft_drop and self.lock_drop or (
 		not ruleset.are or self:getARE() == 0
 	) then
 		self.drop_locked = true
 	end
-	if not inputs.hold and not self.buffer_hard_drop and self.lock_hard_drop or (
+	if not self.buffer_hard_drop and self.lock_hard_drop or (
 		not ruleset.are or self:getARE() == 0
 	) then
 		self.hard_drop_locked = true
@@ -566,13 +566,12 @@ function GameMode:initializeNextPiece(
 			self.piece.locked = self.lock_on_hard_drop
 			self:onHardDrop(self.piece.position.y - prev_y)
 		end
-		if self.buffer_soft_drop then
-			if (
-				self.lock_on_soft_drop and
-				self.piece:isDropBlocked(self.grid)
-			) then
-				self.piece.locked = true
-			end
+		if (
+			self.buffer_soft_drop and
+			self.lock_on_soft_drop and
+			self:getGravity() >= self.grid.height - 4
+		) then
+			self.piece.locked = true
 		end
 	end
 	self.piece_hard_dropped = false
@@ -700,7 +699,10 @@ end
 
 function GameMode:drawNextQueue(ruleset)
 	local colourscheme
-	if ruleset.pieces == 7 then
+	if table.equalvalues(
+		self.used_randomizer.possible_pieces,
+		{"I", "J", "L", "O", "S", "T", "Z"}
+	) then
 		colourscheme = ({ruleset.colourscheme, ColourSchemes.Arika, ColourSchemes.TTC})[config.gamesettings.piece_colour]
 	else
 		colourscheme = ruleset.colourscheme
@@ -920,13 +922,13 @@ function GameMode:draw(paused)
 	self:drawFrame()
 	self:drawGrid()
 	self:drawPiece()
+	if self:canDrawLCA() then
+		self:drawLineClearAnimation()
+	end
 	self:drawNextQueue(self.ruleset)
 	self:drawScoringInfo()
 	self:drawReadyGo()
 	self:drawCustom()
-	if self:canDrawLCA() then
-		self:drawLineClearAnimation()
-	end
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(font_3x5_2)

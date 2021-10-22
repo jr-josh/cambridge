@@ -35,8 +35,6 @@ Ruleset.next_sounds = {
 		T = "T"
 }
 
-Ruleset.pieces = 7
-
 -- Component functions.
 
 function Ruleset:new(game_mode)
@@ -100,10 +98,12 @@ function Ruleset:attemptRotate(new_inputs, piece, grid, initial)
 	if (grid:canPlacePiece(new_piece)) then
 		piece:setRelativeRotation(rot_dir)
 		self:onPieceRotate(piece, grid)
+		playSE("rotate")
 	else
 		if not(initial and self.enable_IRS_wallkicks == false) then
 			self:attemptWallkicks(piece, new_piece, rot_dir, grid)
 		end
+		playSE("kick")
 	end
 end
 
@@ -208,7 +208,9 @@ function Ruleset:initializePiece(
 	end
 
 	local colours
-	if self.pieces == 7 then
+	if table.equalvalues(
+        self.colourscheme, {"I", "J", "L", "O", "S", "T", "Z"}
+    ) then
 		colours = ({self.colourscheme, ColourSchemes.Arika, ColourSchemes.TTC})[config.gamesettings.piece_colour]
 	else
 		colours = self.colourscheme
