@@ -34,6 +34,21 @@ local mainmenuidle = {
 	"This is probably the longest RPC string out of every possible RPC string that can be displayed."
 }
 
+local menusplash = {
+	"Welcome to Cambridge!",
+	"Get ready to put the block!",
+	"Also try Master of Blocks!",
+	"Also try Shiromino!",
+	"1 year in the making!",
+	"haileyjunk!",
+	"WOOOOAAAAAHHH!!!!!"
+}
+
+local currentSplash = menusplash[math.random(#menusplash)]
+local now = os.date("t")
+
+showDebugKeys = false
+
 function TitleScene:new()
 	self.main_menu_state = 1
 	self.frames = 0
@@ -47,6 +62,12 @@ function TitleScene:new()
 		largeImageKey = "1year",
 		largeImageText = version.." | Thanks for 1 year!"
 	})
+
+	if now.month == 12 then
+		DiscordRPC:update({
+			largeImageKey = "snow"
+		})
+	end
 end
 
 function TitleScene:update()
@@ -79,7 +100,7 @@ function TitleScene:render()
 		460, 170, 0,
 		2, 2
 	)
-	love.graphics.printf("Thanks for 1 year!", 430, 280, 160, "center")
+	love.graphics.printf(currentSplash, 390, 280, 320, "center", 0, 0.75, 0.75)
 
 	love.graphics.setFont(font_3x5_2)
 	love.graphics.setColor(1, 1, 1, self.snow_bg_opacity)
@@ -106,6 +127,11 @@ function TitleScene:render()
 	for i, screen in pairs(main_menu_screens) do
 		love.graphics.printf(screen.title, 40, 280 + 20 * i, 120, "left")
 	end
+
+	if showDebugKeys then
+		love.graphics.print("DEBUG KEYS\n\nF3+S: Get new splash message\nF3+R: Restart\nF3+I: Toggle this")
+	end
+
 end
 
 function TitleScene:changeOption(rel)
@@ -113,7 +139,10 @@ function TitleScene:changeOption(rel)
 	self.main_menu_state = (self.main_menu_state + len + rel - 1) % len + 1
 end
 
+
+
 function TitleScene:onInputPress(e)
+	local debugkey = love.keyboard.isDown("f3")
 	if e.input == "menu_decide" or e.scancode == "return" then
 		playSE("main_decide")
 		scene = main_menu_screens[self.main_menu_state]()
@@ -125,6 +154,25 @@ function TitleScene:onInputPress(e)
 		playSE("cursor")
 	elseif e.input == "menu_back" or e.scancode == "backspace" or e.scancode == "delete" then
 		love.event.quit()
+	-- small debug feature, press f3+s to get a new splash message
+	elseif e.scancode == "s" then
+		if debugkey then
+			currentSplash = menusplash[math.random(#menusplash)]
+			playSE("main_decide")
+		end
+	elseif e.scancode == "r" then
+		if debugkey then
+			love.event.quit("restart")
+		end
+	elseif e.scancode == "i" then
+		if debugkey then
+			if showDebugKeys then
+				showDebugKeys = false
+			else
+				showDebugKeys = true
+			end
+		end
+
 	-- no winter easter egg for now
 	--[[
 	else
