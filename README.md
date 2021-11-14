@@ -40,6 +40,14 @@ Alternatively, if you're on a 32-bit system, run this instead:
 
 Then, check the mod pack section at the bottom of this page.
 
+#### Other branches/haileyjunk
+
+The Cambridge repository has multiple public and private branches for working on and testing out major new features over the course of many commits.
+
+If you're looking to test even newer features that aren't even in the master branch, the closest you're going to get is probably the haileyjunk branch, which you can download [here](https://github.com/MillaBasset/cambridge/archive/master.zip).
+
+> WARNING: This branch can be very buggy and broken at times. Use with care.
+
 ### macOS, Linux
 
 If you haven't already, install `love` with your favourite package manager (Homebrew on macOS, your system's default on Linux). **Make sure you're using LÖVE 11, because it won't work with earlier versions!**
