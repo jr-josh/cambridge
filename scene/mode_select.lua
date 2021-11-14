@@ -108,6 +108,7 @@ function ModeSelectScene:render()
 			love.graphics.printf(ruleset.name, 360, (260 - 20*(self.menu_state.ruleset)) + 20 * idx, 160, "left")
 		end
 	end
+	love.graphics.printf(game_modes[self.menu_state.mode].tagline, 5, 5, 600, "left")
 end
 
 function ModeSelectScene:onInputPress(e)

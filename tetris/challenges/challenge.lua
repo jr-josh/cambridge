@@ -14,7 +14,7 @@ local Challenge = GameMode:extend()
 Challenge.name = "A really cool challenge name"
 Challenge.hash = ""
 Challenge.mode = ""
-Challenge.ruleset = "Guideline SRS"
+Challenge.ruleset = ""
 Challenge.tagline = "Are you up for this challenge?"
 Challenge.description = "Complete a mode with a specific ruleset and idk they did some other stupid things too lol"
 

@@ -9,12 +9,12 @@ local MarathonGF = require 'tetris.modes.marathon_gf'
 
 local TetrsChallenge = MarathonGF:extend()
 
-TetrsChallenge.name = "Tetrs"
-TetrsChallenge.hash = "Tetrs"
+TetrsChallenge.name = "Another mode"
+TetrsChallenge.hash = "Tetrs2"
 TetrsChallenge.mode = "MarathonGF"
 TetrsChallenge.ruleset = "Standard"
-TetrsChallenge.tagline = "Where's the long bar? Seriously, I can't find it."
-TetrsChallenge.description = "Complete a 150-line Marathon...without the I piece!"
+TetrsChallenge.tagline = "Hey look! The feature works!"
+TetrsChallenge.description = "This is just a clone of Tetrs to test out the challenge details feature."
 
 function TetrsChallenge:new()
 

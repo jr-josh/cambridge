@@ -99,12 +99,15 @@ function ChallengeSelectScene:render()
 	for idx, challenge in pairs(challenges) do
 		if(idx >= self.menu_state.challenge-9 and idx <= self.menu_state.challenge+9) then
 			love.graphics.printf(challenge.name, 40, (260 - 20*(self.menu_state.challenge)) + 20 * idx, 200, "left")
-			cur_tagline = challenge.tagline
+
 		end
 	end
 
-
-
+-- challenge details
+	love.graphics.printf(challenges[self.menu_state.challenge].tagline, 340, 150, 200, "left")
+	love.graphics.printf(challenges[self.menu_state.challenge].description, 340, 250, 200, "left")
+	love.graphics.printf("Mode: "..challenges[self.menu_state.challenge].mode, 340, 350, 200, "left")
+	love.graphics.printf("Ruleset: "..challenges[self.menu_state.challenge].ruleset, 340, 380, 200, "left")
 end
 
 function ChallengeSelectScene:onInputPress(e)
@@ -151,7 +154,7 @@ function ChallengeSelectScene:onInputPress(e)
 	end
 
 
-	love.graphics.printf("test???", 340, 258, 200, "left")
+
 
 end
 
@@ -175,6 +178,7 @@ end
 function ChallengeSelectScene:changechallenge(rel)
 	local len = table.getn(challenges)
 	self.menu_state.challenge = Mod1(self.menu_state.challenge + rel, len)
+
 end
 
 
