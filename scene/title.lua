@@ -5,6 +5,7 @@ TitleScene.restart_message = false
 
 local main_menu_screens = {
 	ModeSelectScene,
+	ChallengeSelectScene,
 	SettingsScene,
 	CreditsScene,
 	ExitScene,

@@ -1,6 +1,6 @@
 local ModeSelectScene = Scene:extend()
 
-ModeSelectScene.title = "Game Start"
+ModeSelectScene.title = "Freeplay"
 
 current_mode = 1
 current_ruleset = 1

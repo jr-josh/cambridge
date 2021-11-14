@@ -13,14 +13,14 @@ function love.load()
 	loadSave()
 	require "funcs"
 	require "scene"
-	
+
 	--config["side_next"] = false
 	--config["reverse_rotate"] = true
 	--config["das_last_key"] = false
 	--config["fullscreen"] = false
 
 	love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight(), {resizable = true});
-		
+
 	-- used for screenshots
 	GLOBAL_CANVAS = love.graphics.newCanvas()
 
@@ -40,6 +40,13 @@ function initModules()
 	for i=1,#mode_list do
 		if(mode_list[i] ~= "gamemode.lua" and string.sub(mode_list[i], -4) == ".lua") then
 			game_modes[#game_modes+1] = require ("tetris.modes."..string.sub(mode_list[i],1,-5))
+		end
+	end
+	challenges = {}
+	challenge_list = love.filesystem.getDirectoryItems("tetris/challenges")
+	for i=1,#challenge_list do
+		if(challenge_list[i] ~= "challenge.lua" and string.sub(challenge_list[i], -4) == ".lua") then
+			challenges[#challenges+1] = require ("tetris.challenges."..string.sub(challenge_list[i],1,-5))
 		end
 	end
 	rulesets = {}
@@ -72,7 +79,7 @@ function love.draw()
 		(height - scale_factor * 480) / 2
 	)
 	love.graphics.scale(scale_factor)
-		
+
 	scene:render()
 
 	if config.gamesettings.display_gamemode == 1 or scene.title == "Title" then
@@ -83,9 +90,9 @@ function love.draw()
 			"fps - " .. version, 0, 460, 635, "right"
 		)
 	end
-	
+
 	love.graphics.pop()
-		
+
 	love.graphics.setCanvas()
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.draw(GLOBAL_CANVAS)
@@ -120,7 +127,7 @@ function love.keypressed(key, scancode)
 		GLOBAL_CANVAS:newImageData():encode("png", ss_name)
 	-- function keys are reserved
 	elseif string.match(scancode, "^f[1-9]$") or string.match(scancode, "^f[1-9][0-9]+$") then
-		return	
+		return
 	-- escape is reserved for menu_back
 	elseif scancode == "escape" then
 		scene:onInputPress({input="menu_back", type="key", key=key, scancode=scancode})
@@ -140,7 +147,7 @@ function love.keyreleased(key, scancode)
 		scene:onInputRelease({input="menu_back", type="key", key=key, scancode=scancode})
 	-- function keys are reserved
 	elseif string.match(scancode, "^f[1-9]$") or string.match(scancode, "^f[1-9][0-9]+$") then
-		return	
+		return
 	-- handle all other keys; tab is reserved, but the input config scene keeps it from getting configured as a game input, so pass tab to the scene here
 	else
 		local input_released = nil
@@ -186,7 +193,7 @@ function love.joystickaxis(joystick, axis, value)
 		config.input.joysticks and
 		config.input.joysticks[joystick:getName()] and
 		config.input.joysticks[joystick:getName()].axes and
-		config.input.joysticks[joystick:getName()].axes[axis] 
+		config.input.joysticks[joystick:getName()].axes[axis]
 	then
 		if math.abs(value) >= 1 then
 			input_pressed = config.input.joysticks[joystick:getName()].axes[axis][value >= 1 and "positive" or "negative"]
@@ -314,10 +321,10 @@ function love.run()
 		if love.timer then
 			processBGMFadeout(love.timer.step())
 		end
-		
+
 		if scene and scene.update and love.timer then
 			scene:update()
-			
+
 			local frame_duration = 1.0 / TARGET_FPS
 			if time_accumulator < frame_duration then
 				if love.graphics and love.graphics.isActive() and love.draw then

@@ -143,7 +143,7 @@ function GameMode:update(inputs, ruleset)
 	) then
 		self:onAttemptPieceRotate(self.piece, self.grid)
 	end
-	
+
 	if self.piece == nil then
 		self:processDelays(inputs, ruleset)
 	else
@@ -243,7 +243,7 @@ function GameMode:update(inputs, ruleset)
 			if self.immobile_spin_bonus and
 			   self.piece.last_rotated and (
 				self.piece:isDropBlocked(self.grid) and
-				self.piece:isMoveBlocked(self.grid, { x=-1, y=0 }) and 
+				self.piece:isMoveBlocked(self.grid, { x=-1, y=0 }) and
 				self.piece:isMoveBlocked(self.grid, { x=1, y=0 }) and
 				self.piece:isMoveBlocked(self.grid, { x=0, y=-1 })
 			) then
@@ -251,7 +251,7 @@ function GameMode:update(inputs, ruleset)
 			end
 
 			self.grid:applyPiece(self.piece)
-			
+
 			-- mark squares (can be overridden)
 			if self.square_mode then
 				self.squares = self.squares + self.grid:markSquares()
@@ -312,7 +312,7 @@ function GameMode:onAttemptPieceRotate(piece, grid) end
 function GameMode:onPieceMove(piece, grid, dx) end
 function GameMode:onPieceRotate(piece, grid, drot) end
 function GameMode:onPieceDrop(piece, grid, dy) end
-function GameMode:onPieceLock(piece, cleared_row_count) 
+function GameMode:onPieceLock(piece, cleared_row_count)
 	playSE("lock")
 end
 
@@ -616,7 +616,7 @@ function GameMode:drawLineClearAnimation()
 	-- animation function
 	-- params: block x, y, skin, colour
 	-- returns: table with RGBA, skin, colour, x, y
-	
+
 	-- Fadeout (default)
 	--[[
 	function animation(x, y, skin, colour)
@@ -728,8 +728,8 @@ function GameMode:drawNextQueue(ruleset)
 	if self.hold_queue ~= nil and self.enable_hold then
 		self:setHoldOpacity()
 		drawPiece(
-			self.hold_queue.shape, 
-			self.hold_queue.skin, 
+			self.hold_queue.shape,
+			self.hold_queue.skin,
 			ruleset.block_offsets[self.hold_queue.shape][self.hold_queue.orientation],
 			-16, -32
 		)
@@ -828,7 +828,7 @@ end
 
 function GameMode:drawSectionTimesWithSplits(current_section, section_limit)
 	section_limit = section_limit or math.huge
-	
+
 	local section_x = 440
 	local split_x = 530
 
@@ -843,7 +843,7 @@ function GameMode:drawSectionTimesWithSplits(current_section, section_limit)
 			love.graphics.printf(formatTime(split_time), split_x, 40 + 20 * section, 90, "left")
 		end
 	end
-	
+
 	if (current_section <= section_limit) then
 		love.graphics.printf(formatTime(self.frames - self.section_start_time), section_x, 40 + 20 * current_section, 90, "left")
 		love.graphics.printf(formatTime(self.frames), split_x, 40 + 20 * current_section, 90, "left")

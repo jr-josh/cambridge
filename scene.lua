@@ -10,7 +10,9 @@ function Scene:onInputRelease() end
 
 ExitScene = require "scene.exit"
 GameScene = require "scene.game"
+ChallengeScene = require "scene.challenge"
 ModeSelectScene = require "scene.mode_select"
+ChallengeSelectScene = require "scene.challenge_select"
 KeyConfigScene = require "scene.key_config"
 StickConfigScene = require "scene.stick_config"
 InputConfigScene = require "scene.input_config"

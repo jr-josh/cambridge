@@ -118,6 +118,7 @@ misc_graphics = {
 	ready = love.graphics.newImage("res/img/ready.png"),
 	go = love.graphics.newImage("res/img/go.png"),
 	select_mode = love.graphics.newImage("res/img/select_mode.png"),
+	select_challenge = love.graphics.newImage("res/img/select_challenge_placeholder.png"),
 	strike = love.graphics.newImage("res/img/strike.png"),
 	santa = love.graphics.newImage("res/img/santa.png"),
 	icon = love.graphics.newImage("res/img/cambridge_transparent.png")
