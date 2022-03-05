@@ -40,13 +40,23 @@ function ModeSelectScene:new()
 		state = "Choosing a mode",
 		largeImageKey = "ingame-000"
 	})
+	self.mouse_state = {
+		prev_x = 0,
+		prev_y = 0,
+		used_since_last_keypress = true
+	}
 end
 
 function ModeSelectScene:update()
 	switchBGM(nil) -- experimental
 
 	local mouse_x, mouse_y = getScaledPos(love.mouse.getPosition())
-	if love.mouse.isDown(1) and not left_clicked_before then
+	if (mouse_x ~= self.mouse_state.prev_x) or (mouse_y ~= self.mouse_state.prev_y) then
+		self.mouse_state.used_since_last_keypress = true
+	end
+	self.mouse_state.prev_x = mouse_x
+	self.mouse_state.prev_y = mouse_y
+	if self.mouse_state.used_since_last_keypress then
 		if mouse_x < 320 then
 			self.auto_menu_state = "mode"
 		else
@@ -55,11 +65,14 @@ function ModeSelectScene:update()
 		if self.auto_menu_state ~= self.menu_state.select then
 			self:switchSelect()
 		end
-		self.auto_menu_offset = math.floor((mouse_y - 260)/20)
-		if self.auto_menu_offset == 0 and self.auto_menu_state == "mode" then
-			self:startMode()
+		if love.mouse.isDown(1) and not left_clicked_before then
+			self.auto_menu_offset = math.floor((mouse_y - 260)/20)
+			if self.auto_menu_offset == 0 and self.auto_menu_state == "mode" then
+				self:startMode()
+			end
 		end
 	end
+
 	if self.das_up or self.das_down then
 		self.das = self.das + 1
 	else
@@ -127,25 +140,34 @@ function ModeSelectScene:render()
 	love.graphics.setFont(font_3x5_2)
 	for idx, mode in pairs(game_modes) do
 		if(idx >= self.menu_mode_height / 20-10 and idx <= self.menu_mode_height / 20+10) then
-			local b = CursorHighlight(0,(260 - self.menu_mode_height) + 20 * idx,320,20)
+			local b = self:CursorHighlight(0,(260 - self.menu_mode_height) + 20 * idx,320,20)
 			love.graphics.setColor(1,1,b,FadeoutAtEdges((-self.menu_mode_height) + 20 * idx, 180, 20))
 			love.graphics.printf(mode.name, 40, (260 - self.menu_mode_height) + 20 * idx, 200, "left")
 		end
 	end
 	for idx, ruleset in pairs(rulesets) do
 		if(idx >= self.menu_ruleset_height / 20-10 and idx <= self.menu_ruleset_height / 20+10) then
-			local b = CursorHighlight(320,(260 - self.menu_ruleset_height) + 20 * idx,320,20)
+			local b = self:CursorHighlight(320,(260 - self.menu_ruleset_height) + 20 * idx,320,20)
 			love.graphics.setColor(1,1,b,FadeoutAtEdges(-self.menu_ruleset_height + 20 * idx, 180, 20))
 			love.graphics.printf(ruleset.name, 360, (260 - self.menu_ruleset_height) + 20 * idx, 160, "left")
 		end
 	end
 	love.graphics.setColor(1,1,1,1)
 end
+function ModeSelectScene:CursorHighlight(x,y,w,h)
+	if self.mouse_state.used_since_last_keypress then
+		return CursorHighlight(x, y, w, h)
+	else
+		return 1
+	end
+end
+
+
 function CursorHighlight(x,y,w,h)
 	local mouse_x, mouse_y = getScaledPos(love.mouse.getPosition())
 	if mouse_x > x and mouse_x < x+w and mouse_y > y and mouse_y < y+h then
 		return 0
-	else
+	else 
 		return 1
 	end
 end
@@ -182,34 +204,37 @@ function ModeSelectScene:onInputPress(e)
 		if e.y ~= 0 then
 			self:changeOption(-e.y)
 		end
-	elseif e.input == "menu_decide" or e.scancode == "return" then
-		current_mode = self.menu_state.mode
-		current_ruleset = self.menu_state.ruleset
-		config.current_mode = current_mode
-		config.current_ruleset = current_ruleset
-		playSE("mode_decide")
-		saveConfig()
-		scene = GameScene(
-			game_modes[self.menu_state.mode],
-			rulesets[self.menu_state.ruleset],
-			self.secret_inputs
-		)
-	elseif e.input == "up" or e.scancode == "up" then
-		self:changeOption(-1)
-		self.das_up = true
-		self.das_down = nil
-	elseif e.input == "down" or e.scancode == "down" then
-		self:changeOption(1)
-		self.das_down = true
-		self.das_up = nil
-	elseif e.input == "left" or e.input == "right" or e.scancode == "left" or e.scancode == "right" then
-		self:switchSelect()
-	elseif e.input == "menu_back" or e.scancode == "delete" or e.scancode == "backspace" then
-		scene = TitleScene()
-	elseif e.input then
-		self.secret_inputs[e.input] = true
+	else
+		self.mouse_state.used_since_last_keypress = false
+		if e.input == "menu_decide" or e.scancode == "return" then
+			current_mode = self.menu_state.mode
+			current_ruleset = self.menu_state.ruleset
+			config.current_mode = current_mode
+			config.current_ruleset = current_ruleset
+			playSE("mode_decide")
+			saveConfig()
+			scene = GameScene(
+				game_modes[self.menu_state.mode],
+				rulesets[self.menu_state.ruleset],
+				self.secret_inputs
+			)
+		elseif e.input == "up" or e.scancode == "up" then
+			self:changeOption(-1)
+			self.das_up = true
+			self.das_down = nil
+		elseif e.input == "down" or e.scancode == "down" then
+			self:changeOption(1)
+			self.das_down = true
+			self.das_up = nil
+		elseif e.input == "left" or e.input == "right" or e.scancode == "left" or e.scancode == "right" then
+			self:switchSelect()
+		elseif e.input == "menu_back" or e.scancode == "delete" or e.scancode == "backspace" then
+			scene = TitleScene()
+		elseif e.input then
+			self.secret_inputs[e.input] = true
+		end
 	end
-end
+end 
 
 function ModeSelectScene:onInputRelease(e)
 	if e.input == "up" or e.scancode == "up" then
@@ -236,6 +261,7 @@ function ModeSelectScene:switchSelect()
 	elseif self.menu_state.select == "ruleset" then
 		self.menu_state.select = "mode"
 	end
+	print(self.menu_state.select)
 	playSE("cursor_lr")
 end
 
