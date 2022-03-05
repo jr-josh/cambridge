@@ -19,6 +19,7 @@ ConfigScene.options = {
 	{"das_last_key", "DAS Last Key", false, {"Off", "On"}},
 	{"buffer_lock", "Buffer Drop Type", false, {"Off", "Hold", "Tap"}},
 	{"synchroes_allowed", "Synchroes", false, {"Per ruleset", "On", "Off"}},
+	{"smooth_scroll", "Smooth Scrolling", false, {"On", "Off"}},
 	{"sfx_volume", "SFX", true, "sfxSlider"},
 	{"bgm_volume", "BGM", true, "bgmSlider"},
 }
@@ -39,8 +40,25 @@ function ConfigScene:new()
 end
 
 function ConfigScene:update()
-	self.sfxSlider:update()
-	self.bgmSlider:update()
+	local x, y = getScaledPos(love.mouse.getPosition())
+	self.sfxSlider:update(x,y)
+	self.bgmSlider:update(x,y)
+	--#region Mouse
+	if not love.mouse.isDown(1) or left_clicked_before then return end
+	for i, option in ipairs(ConfigScene.options) do
+		if not option[3] then
+		for j, setting in ipairs(option[4]) do
+			if x > 100 + 110 * j and x < 200 + 110 * j then
+				if y > 100 + i * 20 and y < 120 + i * 20 then
+					self.main_menu_state = math.floor((y - 280) / 20)
+					playSE("cursor_lr")
+					config.gamesettings[option[1]] = Mod1(j, #option[4])
+				end
+			end
+			-- local option = ConfigScene.options[self.highlight]
+		end end
+	end
+	--#endregion
 end
 
 function ConfigScene:render()
@@ -68,7 +86,8 @@ function ConfigScene:render()
 			love.graphics.setColor(1, 1, 1, 1)
 			love.graphics.printf(option[2], 40, 100 + i * 20, 150, "left")
 			for j, setting in ipairs(option[4]) do
-				love.graphics.setColor(1, 1, 1, config.gamesettings[option[1]] == j and 1 or 0.5)
+				local b = CursorHighlight(100 + 110 * j, 100 + i * 20,100,20)
+				love.graphics.setColor(1, 1, b, config.gamesettings[option[1]] == j and 1 or 0.5)
 				love.graphics.printf(setting, 100 + 110 * j, 100 + i * 20, 100, "center")
 			end
 		end
@@ -112,7 +131,7 @@ function ConfigScene:onInputPress(e)
 			local option = ConfigScene.options[self.highlight]
 			config.gamesettings[option[1]] = Mod1(config.gamesettings[option[1]]+1, #option[4])
 		else
-			sld = self[self.options[self.highlight][4]]
+			local sld = self[self.options[self.highlight][4]]
 			sld.value = math.max(sld.min, math.min(sld.max, (sld:getValue() + 5) / (sld.max - sld.min)))
 			sld:update()
 			playSE("cursor")

@@ -16,7 +16,17 @@ function ConfigScene:new()
     })
 end
 
-function ConfigScene:update() end
+function ConfigScene:update()
+	if not love.mouse.isDown(1) or left_clicked_before then return end
+	local mouse_x, mouse_y = getScaledPos(love.mouse.getPosition())
+    if mouse_x > 75 and mouse_x < 275 then
+        if mouse_y > 170 and mouse_y < 270 then
+            self.menu_state = math.floor((mouse_y - 120) / 50)
+            playSE("main_decide")
+            scene = menu_screens[self.menu_state]()
+        end
+    end
+end
 
 function ConfigScene:render()
     love.graphics.setColor(1, 1, 1, 1)
@@ -38,6 +48,8 @@ function ConfigScene:render()
     love.graphics.setFont(font_3x5_3)
 	love.graphics.setColor(1, 1, 1, 1)
 	for i, screen in pairs(menu_screens) do
+		local b = CursorHighlight(80,120 + 50 * i,200,50)
+		love.graphics.setColor(1,1,b,1)
 		love.graphics.printf(screen.title, 80, 120 + 50 * i, 200, "left")
     end
 end

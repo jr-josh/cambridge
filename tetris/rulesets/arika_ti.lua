@@ -6,6 +6,7 @@ local ARS = Ruleset:extend()
 ARS.name = "Ti-ARS"
 ARS.hash = "ArikaTI"
 
+ARS.synchroes = true
 -- Component functions.
 
 function ARS:attemptWallkicks(piece, new_piece, rot_dir, grid)
@@ -68,10 +69,10 @@ function ARS:attemptWallkicks(piece, new_piece, rot_dir, grid)
 			piece:setRelativeRotation(rot_dir):setOffset({x=-1, y=0})
 			self:onPieceRotate(piece, grid)
 		elseif piece.shape == "T"
-		   and new_piece.rotation == 0
-		   and piece.floorkick == 0
-		   and piece:isDropBlocked(grid)
-		   and grid:canPlacePiece(new_piece:withOffset({x=0, y=-1}))
+			and new_piece.rotation == 0
+			and piece.floorkick == 0
+			and piece:isDropBlocked(grid)
+			and grid:canPlacePiece(new_piece:withOffset({x=0, y=-1}))
 		then
 			-- T floorkick
 			piece.floorkick = piece.floorkick + 1

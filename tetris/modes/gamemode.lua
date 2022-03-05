@@ -135,6 +135,9 @@ function GameMode:saveReplay()
 	replay["lines"] = self.lines
 	replay["gamesettings"] = config.gamesettings
 	replay["secret_inputs"] = self.secret_inputs
+	replay["delayed_auto_shift"] = config.das
+	replay["auto_repeat_rate"] = config.arr
+	replay["das_cut_delay"] = config.dcd
 	replay["timestamp"] = os.time()
 	if love.filesystem.getInfo("replays") == nil then
 		love.filesystem.createDirectory("replays")
@@ -305,7 +308,7 @@ function GameMode:update(inputs, ruleset)
 		if self.piece.locked == true then
 			-- spin detection, immobile only for now
 			if self.immobile_spin_bonus and
-			   self.piece.last_rotated and (
+				self.piece.last_rotated and (
 				self.piece:isDropBlocked(self.grid) and
 				self.piece:isMoveBlocked(self.grid, { x=-1, y=0 }) and 
 				self.piece:isMoveBlocked(self.grid, { x=1, y=0 }) and
